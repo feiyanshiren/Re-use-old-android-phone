@@ -6,6 +6,7 @@ import web
 
 def post(self):
     try:
+        mapErrorCode = {61:"GPS定位成功",161:"网络定位定位成功"}
         web.header('content-type','text/html;charset=utf-8',unique=True) 
         #获取参数
         nowTime = long(time.time()*1000)
@@ -34,7 +35,8 @@ def post(self):
 #                     sss3 = "<a href='http://api.map.baidu.com/geocoder?location=%s,%s&coord_type=bd09ll&output=html&src=sanyeshu|myLocation3'>地图</a>"%(str(jo.get("lat","0")),str(jo.get("lng","0")))
                     fff["map"] = sss3
                     fff["location"] = jo.get("location","")
-                    fff["type"] = jo.get("type","")
+                    fff["type"] = jo.get("type","") 
+                    fff["battery"] = jo.get("battery",-1)          
                 ddd.append(fff)
             
             oldTime  = nowTime - 86400000 
@@ -46,9 +48,8 @@ def post(self):
             
             strrtn = ""
             for k in ddd:
-                strrtn = strrtn + k.get("time","") + " " + k.get("location","")+" "+k.get("map","")+" "+str(k.get("type",0)) +"<br />"
+                strrtn = strrtn + k.get("time","") + " " + k.get("location","")+" "+k.get("map","")+" "+str(k.get("type",0))+mapErrorCode.get(k.get("type",0),"定位失败") +" 电量" + str(k.get("battery",-1))+"%" + "<br />"
             
             return strrtn
     except Exception,e:
-        print e
-        return u'{"code":-1,"tip":"未知错误"}'
+        return u'{"code":-1,"tip":"%s"}' %(str(e))

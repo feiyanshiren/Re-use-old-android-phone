@@ -1,12 +1,16 @@
 package com.sanyeshu.mylocation3;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.Message;
@@ -17,6 +21,7 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.location.LocationClientOption.LocationMode;
 
+@SuppressLint("UseSparseArrays")
 public class MainServer extends Service implements Runnable{
 	
 	public static String phone = "";
@@ -24,6 +29,13 @@ public class MainServer extends Service implements Runnable{
 	
 	public LocationClient mLocationClient = null;
 	public BDLocationListener myListener = null;
+	
+	@SuppressWarnings("serial")
+	public Map<Integer,String> mapErrorCode = new HashMap<Integer, String>()
+			{{
+				put(61, "GPS定位成功");
+				put(161, "网络定位定位成功");
+			}};
 	
 	@Override
 	public void onDestroy() {
@@ -102,9 +114,16 @@ public class MainServer extends Service implements Runnable{
         		jo.putOpt("lat", location.getLatitude());
         		jo.putOpt("lng", location.getLongitude());
         		jo.putOpt("type", location.getLocType());
+        		jo.putOpt("battery", getBattery());
         		str = jo.toString();
         		Calendar calendar = Calendar.getInstance();
-        		String res = ""+ calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + location.getAddrStr() + location.getLocType();
+        		String type = "定位失败";
+        		if (mapErrorCode.containsKey(location.getLocType()))
+        		{
+        			type = mapErrorCode.get(location.getLocType());
+        		}
+        		String res = ""+ calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + location.getAddrStr() + location.getLocType()
+        				+type+ "电量"+jo.optInt("battery")+"%";
         		if(MainActivity.gHandler!=null)
                 {
                 	Message msg = new Message();
@@ -127,6 +146,16 @@ public class MainServer extends Service implements Runnable{
 	public void run() {
 		 HttpRequest.get("http://122.114.50.50:9999/myLocation2",true,"str",str,"phone",phone).connectTimeout(60000).code();
 //		 HttpRequest.get("http://192.168.0.254:8080/myLocation2",true,"str",str,"phone",phone).connectTimeout(60000).code();
+	}
+	
+	
+	public int getBattery() {
+		Intent batteryInfoIntent = getApplicationContext().getApplicationContext().registerReceiver(null,
+				new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+		int level = batteryInfoIntent.getIntExtra("level", 0);
+		int scale = batteryInfoIntent.getIntExtra("scale", 100);
+		int battery = (level * 100 / scale);
+		return battery;
 	}
 
 }
