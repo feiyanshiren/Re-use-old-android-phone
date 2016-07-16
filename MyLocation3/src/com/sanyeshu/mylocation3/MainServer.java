@@ -144,8 +144,17 @@ public class MainServer extends Service implements Runnable{
 
 	@Override
 	public void run() {
+		try{
 		 HttpRequest.get("http://122.114.50.50:9999/myLocation2",true,"str",str,"phone",phone).connectTimeout(60000).code();
 //		 HttpRequest.get("http://192.168.0.254:8080/myLocation2",true,"str",str,"phone",phone).connectTimeout(60000).code();
+		}
+		catch(Exception e)
+		{
+			Message msg = new Message();
+        	msg.what = MainActivity.UPDATE_TEXT;
+        	msg.obj = e.getMessage();
+        	MainActivity.gHandler.sendMessage(msg);
+		}
 	}
 	
 	
