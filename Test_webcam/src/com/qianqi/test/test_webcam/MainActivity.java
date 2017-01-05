@@ -274,7 +274,7 @@ public class MainActivity extends Activity implements PreviewCallback{
 					{
 //						String img = pickList.get(0);
 						try {
-							String res = HttpRequest.get("http://122.114.50.50:9999/webcam",true,"phone",phone,"other","0").connectTimeout(12000).body();
+							String res = HttpRequest.get("http://211.149.172.120:9999/webcam",true,"phone",phone,"other","0").connectTimeout(12000).body();
 //							String res = HttpRequest.get("http://192.168.0.254:8080/webcam",true,"phone",phone,"other","0").connectTimeout(12000).body();
 							if (res == null || res.equals(""))
 							{
@@ -284,7 +284,7 @@ public class MainActivity extends Activity implements PreviewCallback{
 							if (index > 0)
 							{
 								index = index - 1 ;
-								HttpRequest.get("http://122.114.50.50:9999/webcam",true,"phone",phone,"img",img,"other",""+index).connectTimeout(12000).code();
+								HttpRequest.get("http://211.149.172.120:9999/webcam",true,"phone",phone,"img",img,"other",""+index).connectTimeout(12000).code();
 //								HttpRequest.get("http://192.168.0.254:8080/webcam",true,"phone",phone,"img",img,"other",""+index).connectTimeout(12000).code();
 								
 							}
